@@ -17,8 +17,8 @@ export interface CreateUpdatePostDTO {
 }
 
 export const createUpdatePostSchema = z.object({
-  title: z.string().max(30),
-  shortDescription: z.string().max(100),
-  content: z.string().max(1000),
+  title: z.string().trim().nonempty().max(30),
+  shortDescription: z.string().trim().nonempty().max(100),
+  content: z.string().trim().nonempty().max(1000),
   blogId: z.string(),
 });

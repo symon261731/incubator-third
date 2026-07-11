@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares";
 import { postService } from "../repositories/posts.repository";
 import { createUpdatePostSchema } from "../services/posts.service";
+import { formatError } from "../helpers/formatError";
 
 const postsRouter = Router();
 
@@ -23,7 +24,9 @@ postsRouter
     const result = createUpdatePostSchema.safeParse(req.body);
 
     if (!result.success) {
-      res.status(400).send(result.error);
+      res.status(400).json({
+        errorsMessages: formatError(result.error),
+      });
       return;
     }
 
@@ -37,7 +40,9 @@ postsRouter
     const result = createUpdatePostSchema.safeParse(req.body);
 
     if (!result.success) {
-      res.status(400).send(result.error);
+      res.status(400).json({
+        errorsMessages: formatError(result.error),
+      });
       return;
     }
 

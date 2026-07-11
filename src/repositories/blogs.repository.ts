@@ -7,6 +7,7 @@ interface BlogService {
   getBlogById: (id: string) => Blog | undefined;
   updateBlog: (id: string, blog: BlogCreateUpdateDTO) => boolean;
   deleteBlog: (id: string) => boolean;
+  deleteAllBlogs: () => boolean;
 }
 
 export const blogService: BlogService = {
@@ -41,5 +42,10 @@ export const blogService: BlogService = {
     }
 
     return false;
+  },
+
+  deleteAllBlogs: () => {
+    blogService.blogs = [];
+    return true;
   },
 };

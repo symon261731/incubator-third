@@ -6,8 +6,8 @@ export const authMiddleware = (
   next: NextFunction,
 ) => {
   const auth = req.headers["authorization"] as string;
-  const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "qwerty";
   if (!auth) {
     res.sendStatus(401).send("Unauthorized");
     return;

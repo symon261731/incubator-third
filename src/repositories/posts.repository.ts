@@ -6,6 +6,7 @@ interface PostService {
   getPostById: (id: string) => Post | undefined;
   updatePost: (id: string, post: CreateUpdatePostDTO) => boolean;
   deletePost: (id: string) => boolean;
+  deleteAllPosts: () => boolean;
 }
 
 export const postService: PostService = {
@@ -41,5 +42,9 @@ export const postService: PostService = {
       return true;
     }
     return false;
+  },
+  deleteAllPosts: () => {
+    postService.posts = [];
+    return true;
   },
 };

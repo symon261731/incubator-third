@@ -2,6 +2,7 @@ import { Router } from "express";
 import { blogService } from "../repositories/blogs.repository";
 import { authMiddleware } from "../middlewares";
 import { updateCreateBlogSchema } from "../services/blogs.service";
+import { formatError } from "../helpers/formatError";
 
 const blogsRouter = Router();
 
@@ -21,14 +22,41 @@ blogsRouter
   .post("", authMiddleware, (req, res) => {
     const result = updateCreateBlogSchema.safeParse(req.body);
     if (!result.success) {
-      res.status(400).send(result.error);
+      res.status(400).json({
+        errorsMessages: formatError(result.error),
+      });
       return;
     }
 
     const blog = blogService.createBlog(result.data);
     res.status(201).send(blog);
   })
-  .put("/:id", authMiddleware, (req, res) => {})
+  .put("/:id", authMiddleware, (req, res) => {
+    const id = req.params.id as string | undefined;
+
+    if (!id) {
+      res.status(400).send("id is required");
+      return;
+    }
+
+    const validateResult = updateCreateBlogSchema.safeParse(req.body);
+
+    if (!validateResult.success) {
+      res.status(400).json({
+        errorsMessages: formatError(validateResult.error),
+      });
+
+      return;
+    }
+
+    const successUpdatedBlog = blogService.updateBlog(id, validateResult.data);
+    if (!successUpdatedBlog) {
+      res.status(404).send("not found");
+      return;
+    }
+
+    res.status(204).send();
+  })
   .delete("/:id", authMiddleware, (req, res) => {
     const result = blogService.deleteBlog(req.params.id as string);
     if (!result) {

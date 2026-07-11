@@ -18,7 +18,7 @@ const websiteUrlSchema = z
 
 
 export const updateCreateBlogSchema = z.object({
-  name: z.string().max(15),
+  name: z.string().trim().nonempty().max(15),
   description: z.string().max(500),
   websiteUrl: websiteUrlSchema,
 });
