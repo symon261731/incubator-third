@@ -1,4 +1,4 @@
-import { Blog, BlogCreateUpdateDTO } from "../services/blogs.service";
+import { Blog, BlogCreateUpdateDTO } from "./blogs.service";
 
 interface BlogService {
   blogs: Blog[];

@@ -1,4 +1,4 @@
-import { CreateUpdatePostDTO, Post } from "../services/posts.service";
+import { CreateUpdatePostDTO, Post } from "./posts.service";
 
 interface PostService {
   posts: Post[];

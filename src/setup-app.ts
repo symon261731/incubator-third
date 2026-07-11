@@ -1,6 +1,6 @@
 import express, { Express } from "express";
-import blogsRouter from "./routes/blogs.router";
-import postsRouter from "./routes/posts.router";
+import blogsRouter from "./enteties/blogs/blogs.router";
+import postsRouter from "./enteties/posts/posts.router";
 import testingRouter from "./routes/testing.router";
 
 export const setupApp = (app: Express) => {

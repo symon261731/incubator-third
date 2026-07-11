@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { blogService } from "../repositories/blogs.repository";
-import { authMiddleware } from "../middlewares";
-import { updateCreateBlogSchema } from "../services/blogs.service";
-import { formatError } from "../helpers/formatError";
+import { blogService } from "./blogs.repository";
+import { authMiddleware } from "../../middlewares";
+import { updateCreateBlogSchema } from "./blogs.service";
+import { formatError } from "../../helpers/formatError";
 
 const blogsRouter = Router();
 

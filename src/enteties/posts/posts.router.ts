@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { authMiddleware } from "../middlewares";
-import { postService } from "../repositories/posts.repository";
-import { createUpdatePostSchema } from "../services/posts.service";
-import { formatError } from "../helpers/formatError";
+import { authMiddleware } from "../../middlewares";
+import { postService } from "./posts.repository";
+import { createUpdatePostSchema } from "./posts.service";
+import { formatError } from "../../helpers/formatError";
 
 const postsRouter = Router();
 
