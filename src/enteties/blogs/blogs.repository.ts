@@ -1,31 +1,40 @@
+import { ObjectId } from "mongodb";
+import { blogsCollection } from "../../db/collections";
 import { Blog, BlogCreateUpdateDTO } from "./blogs.service";
 
 interface BlogService {
   blogs: Blog[];
-  createBlog: (blog: BlogCreateUpdateDTO) => Blog;
-  getAllBlogs: () => Blog[];
-  getBlogById: (id: string) => Blog | undefined;
-  updateBlog: (id: string, blog: BlogCreateUpdateDTO) => boolean;
-  deleteBlog: (id: string) => boolean;
-  deleteAllBlogs: () => boolean;
+  createBlog: (blog: BlogCreateUpdateDTO) => Promise<Blog>;
+  getAllBlogs: () => Promise<Blog[]>;
+  getBlogById: (id: string) => Promise<Blog | null>;
+  updateBlog: (id: string, blog: BlogCreateUpdateDTO) => Promise<boolean>;
+  deleteBlog: (id: string) => Promise<boolean>;
+  deleteAllBlogs: () => Promise<boolean>;
 }
 
-export const blogService: BlogService = {
+export const blogRepository: BlogService = {
   blogs: [],
 
-  getAllBlogs: () => {
-    return blogService.blogs;
+  getAllBlogs: async () => {
+    return blogsCollection.find().toArray();
   },
-  createBlog: (blog: BlogCreateUpdateDTO) => {
-    blogService.blogs.push({ ...blog, id: `${blogService.blogs.length + 1}` });
-    return blogService.blogs[blogService.blogs.length - 1];
+  createBlog: async (blog: BlogCreateUpdateDTO) => {
+    const newBlog: Blog = {
+      id: new ObjectId().toString(),
+      ...blog,
+    };
+
+    const createResult = await blogsCollection.insertOne(newBlog);
+
+    return { ...newBlog, _id: createResult.insertedId };
   },
 
-  getBlogById: (id: string) => {
-    return blogService.blogs.find((blog) => blog.id === id);
+  getBlogById: async (id: string) => {
+    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
+    return blog
   },
 
-  updateBlog: (id: string, blog: BlogCreateUpdateDTO) => {
+  updateBlog: async (id: string, blog: BlogCreateUpdateDTO) => {
     const index = blogService.blogs.findIndex((blog) => blog.id === id);
     if (index !== -1) {
       blogService.blogs[index] = { id, ...blog };
@@ -34,7 +43,7 @@ export const blogService: BlogService = {
     return false;
   },
 
-  deleteBlog: (id: string) => {
+  deleteBlog: async (id: string) => {
     const index = blogService.blogs.findIndex((blog) => blog.id === id);
     if (index !== -1) {
       blogService.blogs.splice(index, 1);

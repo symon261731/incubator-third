@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { blogService } from "../repositories/blogs.repository";
-import { postService } from "../repositories/posts.repository";
+import { blogService } from "../enteties/blogs/blogs.repository";
+import { postService } from "../enteties/posts/posts.repository";
 
 const testingRouter = Router();
 
