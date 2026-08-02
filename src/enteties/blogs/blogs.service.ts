@@ -6,7 +6,7 @@ export interface Blog {
   description: string;
   websiteUrl: string;
   createdAt: string;
-  isMembership: boolean;
+  isMembership?: boolean;
 }
 
 export type CreateBlogDTO = Omit<Blog, "id" | "createdAt">;

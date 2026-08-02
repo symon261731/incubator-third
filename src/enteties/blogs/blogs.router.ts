@@ -32,15 +32,7 @@ blogsRouter
       return;
     }
 
-    const createBlogInitialData: BlogCreateUpdateDTO = {
-      name: result.data.name,
-      description: result.data.description,
-      websiteUrl: result.data.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
-
-    const blog = await blogRepository.createBlog(createBlogInitialData);
+    const blog = await blogRepository.createBlog(result.data);
     res.status(201).send(blog);
   })
   .put("/:id", authMiddleware, async (req, res) => {

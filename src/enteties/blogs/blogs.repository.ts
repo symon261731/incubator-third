@@ -3,7 +3,7 @@ import { blogsCollection } from "../../db/collections";
 import { Blog, BlogCreateUpdateDTO, CreateBlogDTO } from "./blogs.service";
 
 interface BlogRepository {
-  createBlog: (blog: BlogCreateUpdateDTO) => Promise<Blog>;
+  createBlog: (blog: CreateBlogDTO) => Promise<Blog>;
   getAllBlogs: () => Promise<Blog[]>;
   getBlogById: (id: string) => Promise<Blog | null>;
   updateBlog: (id: string, blog: BlogCreateUpdateDTO) => Promise<boolean>;
@@ -20,6 +20,7 @@ export const blogRepository: BlogRepository = {
       id: new ObjectId().toString(),
       createdAt: new Date().toISOString(),
       ...blog,
+      isMembership: false,
     };
 
     const createResult = await blogsCollection.insertOne(newBlog);

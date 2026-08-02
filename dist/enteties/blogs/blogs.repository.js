@@ -17,7 +17,7 @@ exports.blogRepository = {
         return collections_1.blogsCollection.find().toArray();
     }),
     createBlog: (blog) => __awaiter(void 0, void 0, void 0, function* () {
-        const newBlog = Object.assign({ id: new mongodb_1.ObjectId().toString(), createdAt: new Date().toISOString() }, blog);
+        const newBlog = Object.assign(Object.assign({ id: new mongodb_1.ObjectId().toString(), createdAt: new Date().toISOString() }, blog), { isMembership: false });
         const createResult = yield collections_1.blogsCollection.insertOne(newBlog);
         return Object.assign(Object.assign({}, newBlog), { _id: createResult.insertedId });
     }),

@@ -37,14 +37,7 @@ blogsRouter
         });
         return;
     }
-    const createBlogInitialData = {
-        name: result.data.name,
-        description: result.data.description,
-        websiteUrl: result.data.websiteUrl,
-        createdAt: new Date().toISOString(),
-        isMembership: false,
-    };
-    const blog = yield blogs_repository_1.blogRepository.createBlog(createBlogInitialData);
+    const blog = yield blogs_repository_1.blogRepository.createBlog(result.data);
     res.status(201).send(blog);
 }))
     .put("/:id", middlewares_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
