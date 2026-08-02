@@ -1,50 +1,53 @@
-import { CreateUpdatePostDTO, Post } from "./posts.service";
+import { CreateUpdatePostDTO, CreatePostDTO, Post } from "./posts.service";
+import { postsCollection } from "../../db/collections";
+import { ObjectId, WithId } from "mongodb";
 
-interface PostService {
-  posts: Post[];
-  createPost: (post: CreateUpdatePostDTO) => void;
-  getPostById: (id: string) => Post | undefined;
-  updatePost: (id: string, post: CreateUpdatePostDTO) => boolean;
-  deletePost: (id: string) => boolean;
-  deleteAllPosts: () => boolean;
+interface PostRepository {
+  getAllPosts: () => Promise<Post[]>;
+  createPost: (post: CreatePostDTO) => Promise<WithId<Post>>;
+  getPostById: (id: string) => Promise<Post | null>;
+  updatePost: (id: string, post: CreateUpdatePostDTO) => Promise<boolean>;
+  deletePost: (id: string) => Promise<boolean>;
+  deleteAllPosts: () => Promise<boolean>;
 }
 
-export const postService: PostService = {
-  posts: [],
-  createPost: (post: CreateUpdatePostDTO) => {
-    postService.posts.push({
-      id: `${postService.posts.length + 1}`,
-      ...post,
-      blogName: "",
-    });
+export const postRepository: PostRepository = {
+  getAllPosts: async () => {
+    const result = await postsCollection.find().toArray();
+    return result;
+  },
 
-    return postService.posts[postService.posts.length - 1];
+  createPost: async (post: CreatePostDTO) => {
+    const newPost: Post = {
+      id: new ObjectId().toString(),
+      createdAt: new Date().toISOString(),
+      ...post,
+    };
+    const result = await postsCollection.insertOne(newPost);
+
+    return { ...newPost, _id: result.insertedId };
   },
-  getPostById: (id: string) => {
-    return postService.posts.find((post) => post.id === id);
+  getPostById: async (id: string) => {
+    const post = await postsCollection.findOne({ _id: new ObjectId(id) });
+
+    return post;
   },
-  updatePost: (id: string, post: CreateUpdatePostDTO) => {
-    const index = postService.posts.findIndex((post) => post.id === id);
-    if (index !== -1) {
-      postService.posts[index] = {
-        ...postService.posts[index],
-        ...post,
-        id,
-      };
-      return true;
-    }
-    return false;
+
+  updatePost: async (id: string, post: CreateUpdatePostDTO) => {
+    const result = await postsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: post },
+    );
+
+    return result.matchedCount > 0;
   },
-  deletePost: (id: string) => {
-    const index = postService.posts.findIndex((post) => post.id === id);
-    if (index !== -1) {
-      postService.posts.splice(index, 1);
-      return true;
-    }
-    return false;
+  deletePost: async (id: string) => {
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
+
+    return result.deletedCount > 0;
   },
-  deleteAllPosts: () => {
-    postService.posts = [];
-    return true;
+  deleteAllPosts: async () => {
+    const result = await postsCollection.deleteMany({});
+    return result.deletedCount === 0;
   },
 };

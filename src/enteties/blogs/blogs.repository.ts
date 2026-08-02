@@ -1,9 +1,8 @@
 import { ObjectId } from "mongodb";
 import { blogsCollection } from "../../db/collections";
-import { Blog, BlogCreateUpdateDTO } from "./blogs.service";
+import { Blog, BlogCreateUpdateDTO, CreateBlogDTO } from "./blogs.service";
 
-interface BlogService {
-  blogs: Blog[];
+interface BlogRepository {
   createBlog: (blog: BlogCreateUpdateDTO) => Promise<Blog>;
   getAllBlogs: () => Promise<Blog[]>;
   getBlogById: (id: string) => Promise<Blog | null>;
@@ -12,15 +11,14 @@ interface BlogService {
   deleteAllBlogs: () => Promise<boolean>;
 }
 
-export const blogRepository: BlogService = {
-  blogs: [],
-
+export const blogRepository: BlogRepository = {
   getAllBlogs: async () => {
     return blogsCollection.find().toArray();
   },
-  createBlog: async (blog: BlogCreateUpdateDTO) => {
+  createBlog: async (blog: CreateBlogDTO) => {
     const newBlog: Blog = {
       id: new ObjectId().toString(),
+      createdAt: new Date().toISOString(),
       ...blog,
     };
 
@@ -31,30 +29,28 @@ export const blogRepository: BlogService = {
 
   getBlogById: async (id: string) => {
     const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
-    return blog
+    return blog;
   },
 
   updateBlog: async (id: string, blog: BlogCreateUpdateDTO) => {
-    const index = blogService.blogs.findIndex((blog) => blog.id === id);
-    if (index !== -1) {
-      blogService.blogs[index] = { id, ...blog };
-      return true;
-    }
-    return false;
+    const updateResult = await blogsCollection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: blog },
+    );
+
+    return updateResult.matchedCount > 0;
   },
 
   deleteBlog: async (id: string) => {
-    const index = blogService.blogs.findIndex((blog) => blog.id === id);
-    if (index !== -1) {
-      blogService.blogs.splice(index, 1);
-      return true;
-    }
+    const deleteResult = await blogsCollection.deleteOne({
+      _id: new ObjectId(id),
+    });
 
-    return false;
+    return deleteResult.deletedCount > 0;
   },
 
-  deleteAllBlogs: () => {
-    blogService.blogs = [];
-    return true;
+  deleteAllBlogs: async () => {
+    const deleteResult = await blogsCollection.deleteMany({});
+    return deleteResult.deletedCount > 0;
   },
 };

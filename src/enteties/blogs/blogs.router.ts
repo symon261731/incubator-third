@@ -1,25 +1,29 @@
 import { Router } from "express";
-import { blogService } from "./blogs.repository";
+import { blogRepository } from "./blogs.repository";
 import { authMiddleware } from "../../middlewares";
-import { updateCreateBlogSchema } from "./blogs.service";
+import {
+  BlogCreateUpdateDTO,
+  updateBlogSchema,
+  updateCreateBlogSchema,
+} from "./blogs.service";
 import { formatError } from "../../helpers/formatError";
 
 const blogsRouter = Router();
 
 blogsRouter
   .get("/", (_, res) => {
-    const blogs = blogService.getAllBlogs();
+    const blogs = blogRepository.getAllBlogs();
     res.status(200).send(blogs);
   })
   .get("/:id", (req, res) => {
-    const blog = blogService.getBlogById(req.params.id);
+    const blog = blogRepository.getBlogById(req.params.id);
     if (Boolean(blog)) {
       res.status(200).send(blog);
     } else {
       res.status(404).send("Blog not found");
     }
   })
-  .post("", authMiddleware, (req, res) => {
+  .post("", authMiddleware, async (req, res) => {
     const result = updateCreateBlogSchema.safeParse(req.body);
     if (!result.success) {
       res.status(400).json({
@@ -28,10 +32,18 @@ blogsRouter
       return;
     }
 
-    const blog = blogService.createBlog(result.data);
+    const createBlogInitialData: BlogCreateUpdateDTO = {
+      name: result.data.name,
+      description: result.data.description,
+      websiteUrl: result.data.websiteUrl,
+      createdAt: new Date().toISOString(),
+      isMembership: false,
+    };
+
+    const blog = await blogRepository.createBlog(createBlogInitialData);
     res.status(201).send(blog);
   })
-  .put("/:id", authMiddleware, (req, res) => {
+  .put("/:id", authMiddleware, async (req, res) => {
     const id = req.params.id as string | undefined;
 
     if (!id) {
@@ -39,7 +51,7 @@ blogsRouter
       return;
     }
 
-    const validateResult = updateCreateBlogSchema.safeParse(req.body);
+    const validateResult = updateBlogSchema.safeParse(req.body);
 
     if (!validateResult.success) {
       res.status(400).json({
@@ -49,7 +61,10 @@ blogsRouter
       return;
     }
 
-    const successUpdatedBlog = blogService.updateBlog(id, validateResult.data);
+    const successUpdatedBlog = await blogRepository.updateBlog(
+      id,
+      validateResult.data,
+    );
     if (!successUpdatedBlog) {
       res.status(404).send("not found");
       return;
@@ -58,7 +73,7 @@ blogsRouter
     res.status(204).send();
   })
   .delete("/:id", authMiddleware, (req, res) => {
-    const result = blogService.deleteBlog(req.params.id as string);
+    const result = blogRepository.deleteBlog(req.params.id as string);
     if (!result) {
       res.status(404).send("Blog not found");
       return;

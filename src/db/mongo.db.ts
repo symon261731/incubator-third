@@ -6,7 +6,7 @@ export let client: MongoClient;
 
 export async function runDB(url: string): Promise<void> {
   client = new MongoClient(url);
-  const db: Db = client.db(SETTINGS.MONGO_URL);
+  const db: Db = client.db(SETTINGS.MONGO_DB_NAME || "");
 
   initCollections(db);
 

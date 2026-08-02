@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCreateBlogSchema = void 0;
+exports.updateBlogSchema = exports.updateCreateBlogSchema = void 0;
 const z = __importStar(require("zod"));
 const websiteUrlSchema = z
     .string()
@@ -43,4 +43,11 @@ exports.updateCreateBlogSchema = z.object({
     name: z.string().trim().nonempty().max(15),
     description: z.string().max(500),
     websiteUrl: websiteUrlSchema,
+});
+exports.updateBlogSchema = z.object({
+    name: z.string().trim().nonempty().max(15),
+    description: z.string().max(500),
+    websiteUrl: websiteUrlSchema,
+    createdAt: z.string(),
+    isMembership: z.boolean(),
 });

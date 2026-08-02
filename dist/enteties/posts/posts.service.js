@@ -33,11 +33,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUpdatePostSchema = void 0;
+exports.updatePostSchema = exports.createUpdatePostSchema = void 0;
 const z = __importStar(require("zod"));
 exports.createUpdatePostSchema = z.object({
     title: z.string().trim().nonempty().max(30),
     shortDescription: z.string().trim().nonempty().max(100),
     content: z.string().trim().nonempty().max(1000),
     blogId: z.string(),
+    blogName: z.string(),
+});
+exports.updatePostSchema = z.object({
+    title: z.string().trim().nonempty().max(30),
+    shortDescription: z.string().trim().nonempty().max(100),
+    content: z.string().trim().nonempty().max(1000),
+    blogId: z.string(),
+    createdAt: z.string(),
 });

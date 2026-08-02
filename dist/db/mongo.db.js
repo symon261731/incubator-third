@@ -17,7 +17,7 @@ const collections_1 = require("./collections");
 function runDB(url) {
     return __awaiter(this, void 0, void 0, function* () {
         exports.client = new mongodb_1.MongoClient(url);
-        const db = exports.client.db(index_1.SETTINGS.MONGO_URL);
+        const db = exports.client.db(index_1.SETTINGS.MONGO_DB_NAME || "");
         (0, collections_1.initCollections)(db);
         try {
             yield exports.client.connect();
