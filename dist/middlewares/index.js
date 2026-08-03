@@ -11,6 +11,7 @@ const authMiddleware = (req, res, next) => {
     }
     const [authType, token] = auth.split(" ");
     if (authType !== "Basic") {
+        console.log(req.path, 'rejected by authMiddleware');
         res.status(401).send("Unauthorized");
         return;
     }

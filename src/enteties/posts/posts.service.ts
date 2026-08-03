@@ -1,7 +1,6 @@
-import * as z from "zod";
+import { WithId } from "mongodb";
 
 export interface Post {
-  id: string;
   title: string;
   shortDescription: string;
   content: string;
@@ -10,27 +9,19 @@ export interface Post {
   blogName: string;
 }
 
-export type CreatePostDTO = Omit<Post, "id" | "createdAt">;
+export interface PostResponse extends Post {
+  id: string;
+}
 
-export interface CreateUpdatePostDTO {
+export type PostWithId = WithId<Post>;
+
+export type CreatePostDTO = Omit<Post, "createdAt" | "blogName">;
+
+export interface UpdatePostDTO {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
 }
 
-export const createUpdatePostSchema = z.object({
-  title: z.string().trim().nonempty().max(30),
-  shortDescription: z.string().trim().nonempty().max(100),
-  content: z.string().trim().nonempty().max(1000),
-  blogId: z.string(),
-  blogName: z.string(),
-});
 
-export const updatePostSchema = z.object({
-  title: z.string().trim().nonempty().max(30),
-  shortDescription: z.string().trim().nonempty().max(100),
-  content: z.string().trim().nonempty().max(1000),
-  blogId: z.string(),
-  createdAt: z.string(),
-});

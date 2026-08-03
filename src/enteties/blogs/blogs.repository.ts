@@ -1,12 +1,17 @@
 import { ObjectId } from "mongodb";
 import { blogsCollection } from "../../db/collections";
-import { Blog, BlogCreateUpdateDTO, CreateBlogDTO } from "./blogs.service";
+import {
+  Blog,
+  BlogUpdateDTO,
+  BlogWithId,
+  CreateBlogDTO,
+} from "./blogs.service";
 
 interface BlogRepository {
-  createBlog: (blog: CreateBlogDTO) => Promise<Blog>;
-  getAllBlogs: () => Promise<Blog[]>;
-  getBlogById: (id: string) => Promise<Blog | null>;
-  updateBlog: (id: string, blog: BlogCreateUpdateDTO) => Promise<boolean>;
+  getAllBlogs: () => Promise<BlogWithId[]>;
+  getBlogById: (id: string) => Promise<BlogWithId | null>;
+  createBlog: (blog: CreateBlogDTO) => Promise<BlogWithId>;
+  updateBlog: (id: string, blog: BlogUpdateDTO) => Promise<boolean>;
   deleteBlog: (id: string) => Promise<boolean>;
   deleteAllBlogs: () => Promise<boolean>;
 }
@@ -17,23 +22,28 @@ export const blogRepository: BlogRepository = {
   },
   createBlog: async (blog: CreateBlogDTO) => {
     const newBlog: Blog = {
-      id: new ObjectId().toString(),
+      isMembership: false,
       createdAt: new Date().toISOString(),
       ...blog,
-      isMembership: false,
     };
 
-    const createResult = await blogsCollection.insertOne(newBlog);
+    const result = await blogsCollection.insertOne(newBlog);
 
-    return { ...newBlog, _id: createResult.insertedId };
+    return { ...newBlog, _id: result.insertedId };
   },
 
   getBlogById: async (id: string) => {
-    const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
-    return blog;
+    try {
+      const blog = await blogsCollection.findOne({ _id: new ObjectId(id) });
+      
+      return blog;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   },
 
-  updateBlog: async (id: string, blog: BlogCreateUpdateDTO) => {
+  updateBlog: async (id: string, blog: BlogUpdateDTO) => {
     const updateResult = await blogsCollection.updateOne(
       { _id: new ObjectId(id) },
       { $set: blog },

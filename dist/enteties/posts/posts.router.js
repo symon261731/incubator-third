@@ -12,37 +12,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = require("../../middlewares");
 const posts_repository_1 = require("./posts.repository");
-const posts_service_1 = require("./posts.service");
+const schema_1 = require("./validation/schema");
 const formatError_1 = require("../../helpers/formatError");
+const posts_mappers_1 = require("./posts.mappers");
 const postsRouter = (0, express_1.Router)();
 postsRouter
-    .get("", (_, res) => {
-    const posts = posts_repository_1.postRepository;
-    res.status(200).send(posts);
-})
-    .get("/:id", (req, res) => {
+    .get("", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const posts = yield posts_repository_1.postRepository.getAllPosts();
+    console.log("posts list", posts);
+    res.status(200).send(posts.map((post) => (0, posts_mappers_1.mapMongoPostToResponse)(post)));
+}))
+    .get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const post = posts_repository_1.postRepository.getPostById(id);
+    const post = yield posts_repository_1.postRepository.getPostById(id);
     if (!post) {
         res.status(404).send("Post not found");
         return;
     }
-    res.status(200).send(post);
-})
-    .post("", middlewares_1.authMiddleware, (req, res) => {
-    const result = posts_service_1.createUpdatePostSchema.safeParse(req.body);
+    console.log(`route get post/${post === null || post === void 0 ? void 0 : post._id}`, post);
+    res.status(200).send((0, posts_mappers_1.mapMongoPostToResponse)(post));
+}))
+    .post("", middlewares_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = schema_1.createUpdatePostSchema.safeParse(req.body);
     if (!result.success) {
         res.status(400).json({
             errorsMessages: (0, formatError_1.formatError)(result.error),
         });
         return;
     }
-    const post = posts_repository_1.postRepository.createPost(result.data);
-    res.status(201).send(post);
-})
+    const post = yield posts_repository_1.postRepository.createPost(result.data);
+    console.log(`route create post`, post);
+    res.status(201).send((0, posts_mappers_1.mapMongoPostToResponse)(post));
+}))
     .put("/:id", middlewares_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const result = posts_service_1.updatePostSchema.safeParse(req.body);
+    const result = schema_1.updatePostSchema.safeParse(req.body);
     if (!result.success) {
         res.status(400).json({
             errorsMessages: (0, formatError_1.formatError)(result.error),
@@ -56,12 +60,13 @@ postsRouter
     }
     res.status(204).send();
 }))
-    .delete("/:id", middlewares_1.authMiddleware, (req, res) => {
-    const result = posts_repository_1.postRepository.deletePost(req.params.id);
+    .delete("/:id", middlewares_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield posts_repository_1.postRepository.deletePost(req.params.id);
+    console.log(`route delete post/${req.params.id}`, result);
     if (!result) {
         res.status(404).send("Post not found");
         return;
     }
     res.status(204).send();
-});
+}));
 exports.default = postsRouter;

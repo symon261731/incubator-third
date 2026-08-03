@@ -17,13 +17,19 @@ exports.blogRepository = {
         return collections_1.blogsCollection.find().toArray();
     }),
     createBlog: (blog) => __awaiter(void 0, void 0, void 0, function* () {
-        const newBlog = Object.assign(Object.assign({ id: new mongodb_1.ObjectId().toString(), createdAt: new Date().toISOString() }, blog), { isMembership: false });
-        const createResult = yield collections_1.blogsCollection.insertOne(newBlog);
-        return Object.assign(Object.assign({}, newBlog), { _id: createResult.insertedId });
+        const newBlog = Object.assign({ isMembership: false, createdAt: new Date().toISOString() }, blog);
+        const result = yield collections_1.blogsCollection.insertOne(newBlog);
+        return Object.assign(Object.assign({}, newBlog), { _id: result.insertedId });
     }),
     getBlogById: (id) => __awaiter(void 0, void 0, void 0, function* () {
-        const blog = yield collections_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
-        return blog;
+        try {
+            const blog = yield collections_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(id) });
+            return blog;
+        }
+        catch (error) {
+            console.error(error);
+            return null;
+        }
     }),
     updateBlog: (id, blog) => __awaiter(void 0, void 0, void 0, function* () {
         const updateResult = yield collections_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, { $set: blog });

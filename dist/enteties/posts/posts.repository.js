@@ -18,7 +18,8 @@ exports.postRepository = {
         return result;
     }),
     createPost: (post) => __awaiter(void 0, void 0, void 0, function* () {
-        const newPost = Object.assign({ id: new mongodb_1.ObjectId().toString(), createdAt: new Date().toISOString() }, post);
+        const blog = yield collections_1.blogsCollection.findOne({ _id: new mongodb_1.ObjectId(post.blogId) });
+        const newPost = Object.assign(Object.assign({ createdAt: new Date().toISOString() }, post), { blogName: (blog === null || blog === void 0 ? void 0 : blog.name) || "" });
         const result = yield collections_1.postsCollection.insertOne(newPost);
         return Object.assign(Object.assign({}, newPost), { _id: result.insertedId });
     }),
